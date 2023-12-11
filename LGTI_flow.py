@@ -22,7 +22,6 @@ class Run_Net():
         self.num_class = num_class
         self.out_features = out_features
         self.num_heads = num_heads
-        self.num_class = num_class
         self.lr = lr
         self.epoches = epoches
 
