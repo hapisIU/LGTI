@@ -72,4 +72,4 @@ class Run_Net():
 if __name__ == '__main__':
     model = Run_Net(num_embeddings=256, embedding_dim=64, hidden_size=64, batch_size=128, out_features=128,
                     num_class=120, lr=0.001, epoches=100, num_heads=8, dropout=0.5, smoothing=0.05)
-    model.run('flowdata/data_dev.txt')
+    model.run('flowdata/data_test.txt')
