@@ -53,27 +53,21 @@ class Run_Net():
     def run(self, dev_file):
         dev_dataloader = self.dataloader(dev_file)
         devlen = len(dev_dataloader)
-        for e in range(self.epoches):
-            dev_f1 = 0
-            dev_acc = 0
-            dev_recall = 0
-            dev_precision = 0
-            print("Epoch:{}".format(e))
-            for i, (Li1, Lt1, payload1, Li2, Lt2, payload2, label) in enumerate(dev_dataloader):
-                self.net.eval()
-                out1 = self.net(Li1, Lt1, payload1)
-                out2 = self.net(Li2, Lt2, payload2)
-                out = out1 + out2
-                pre = out.max(1)[1].cpu().detach().numpy()
-                true = label.cpu().detach().numpy()
-                dev_f1 = dev_f1 + f1_score(pre, true, average='macro')
-                dev_acc = dev_acc + accuracy_score(pre, true)
-                dev_precision = dev_precision + precision_score(pre, true, average='macro')
-                dev_recall = dev_recall + recall_score(pre, true, average='macro')
-            print("dev_acc:{:.4f}".format(dev_acc / devlen))
-            print("dev_recall:{:.4f}".format(dev_recall / devlen))
-            print("dev_f1:{:.4f}".format(dev_f1 / devlen))
-            print("dev_precision:{:.4f}".format(dev_precision / devlen))
+        for i, (Li1, Lt1, payload1, Li2, Lt2, payload2, label) in enumerate(dev_dataloader):
+            self.net.eval()
+            out1 = self.net(Li1, Lt1, payload1)
+            out2 = self.net(Li2, Lt2, payload2)
+            out = out1 + out2
+            pre = out.max(1)[1].cpu().detach().numpy()
+            true = label.cpu().detach().numpy()
+            dev_f1 = dev_f1 + f1_score(pre, true, average='macro')
+            dev_acc = dev_acc + accuracy_score(pre, true)
+            dev_precision = dev_precision + precision_score(pre, true, average='macro')
+            dev_recall = dev_recall + recall_score(pre, true, average='macro')
+        print("dev_acc:{:.4f}".format(dev_acc / devlen))
+        print("dev_recall:{:.4f}".format(dev_recall / devlen))
+        print("dev_f1:{:.4f}".format(dev_f1 / devlen))
+        print("dev_precision:{:.4f}".format(dev_precision / devlen))
 
 
 if __name__ == '__main__':
