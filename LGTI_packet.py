@@ -145,6 +145,7 @@ class Run_Net():
         self.num_class = num_class
         self.out_features = out_features
         self.num_heads = num_heads
+        self.num_class = num_class
         self.lr = lr
 
     def load_data(self, file):
@@ -243,9 +244,32 @@ class Run_Net():
             f1.write("dev_precision:{:.4f}".format(dev_precision / devlen) + "\n")
             f1.write("dev_recall:{:.4f}".format(dev_recall / devlen) + "\n")
 
+    def test(self, pth, file):
+        model = torch.load(pth)
+        tes_f1 = 0
+        tes_acc = 0
+        tes_recall = 0
+        tes_precision = 0
+        tes_dataloader = self.dataloader(file)
+        teslen = len(tes_dataloader)
+        for i, (Li1, Lt1, payload1, label) in enumerate(tes_dataloader):
+            model.eval()
+            out = model(Li1, Lt1, payload1)
+            pre = out.max(1)[1].cpu().detach().numpy()
+            true = label.cpu().detach().numpy()
+            tes_f1 = tes_f1 + f1_score(pre, true, average='macro')
+            tes_acc = tes_acc + accuracy_score(pre, true)
+            tes_precision = tes_precision + precision_score(pre, true, average='macro')
+            tes_recall = tes_recall + recall_score(pre, true, average='macro')
+        print("tes_acc:{:.4f}".format(tes_acc / teslen))
+        print("tes_recall:{:.4f}".format(tes_recall / teslen))
+        print("tes_f1:{:.4f}".format(tes_f1 / teslen))
+        print("tes_precision:{:.4f}".format(tes_precision / teslen))
+
 
 if __name__ == '__main__':
     model = Run_Net(num_embeddings=256, embedding_dim=64, hidden_size=64, batch_size=128, out_features=128,
                     num_class=120, lr=0.001, epoches=100, num_heads=8, dropout=0.5, smoothing=0.05)
 
-    model.run('result/LGTI_packet.txt', 'packetdata/data_train.txt', 'packetdata/data_dev.txt')
+    model.run('result/LGTI_packet.txt', 'packetdata/data_train.txt', 'packetdata/data_validation.txt')
+    model.test('pth/ourmodel_packet.pth', "'packetdata/data_test.txt'")
